@@ -39,7 +39,7 @@ export class DeliveryService {
 
     this.crmUrl = this.configService.get<string>(
       'CRM_URL',
-      'https://forge-fitness.onrender.com/api/inquiries',
+      'https://fitness-forge-telegram-automation.onrender.com/api/inquiries',
     );
     this.staffChannelId = this.configService.get<string>(
       'STAFF_CHANNEL_ID',
