@@ -10,4 +10,6 @@ services:
         value: production
       - key: NODE_OPTIONS
         value: '--max-old-space-size=460'
+      - key: NODE_VERSION
+        value: '22'
     healthCheckPath: /
