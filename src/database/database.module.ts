@@ -14,8 +14,7 @@ export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
       provide: DATABASE_CONNECTION,
       useFactory: (configService: ConfigService) => {
         const connectionString =
-          configService.get<string>('DATABASE_URL') ||
-          'postgresql://neondb_owner:npg_cbSYx6q3Mtwk@ep-holy-fire-a44g93lx-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+          configService.get<string>('DATABASE_URL') || '';
 
         const pool = new Pool({
           connectionString,

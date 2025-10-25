@@ -7,78 +7,88 @@ import { DATABASE_CONNECTION } from '../database/database.module';
 @Injectable()
 export class ContentService {
   private readonly logger = new Logger(ContentService.name);
-  private pricingCache: schema.Pricing[] = [];
-  private timetableCache: schema.Timetable[] = [];
-  private ptPackagesCache: schema.PtPackage[] = [];
-  private promotionsCache: schema.Promotion[] = [];
+  // private pricingCache: schema.Pricing[] = [];
+  // private timetableCache: schema.Timetable[] = [];
+  // private ptPackagesCache: schema.PtPackage[] = [];
+  // private promotionsCache: schema.Promotion[] = [];
   private lastCacheUpdate = 0;
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly CACHE_DURATION = 60 * 1000; // 1 minute
 
   constructor(
     @Inject(DATABASE_CONNECTION)
     private readonly db: NodePgDatabase<typeof schema>,
   ) {}
 
-  private async refreshCache(): Promise<void> {
-    const now = Date.now();
-    if (now - this.lastCacheUpdate < this.CACHE_DURATION) {
-      return; // Cache is still fresh
-    }
+  // private async refreshCache(): Promise<void> {
+  //   const now = Date.now();
+  //   if (now - this.lastCacheUpdate < this.CACHE_DURATION) {
+  //     return; // Cache is still fresh
+  //   }
 
-    try {
-      this.logger.log('Refreshing content cache...');
+  //   try {
+  //     this.logger.log('Refreshing content cache...');
 
-      const [pricing, timetable, ptPackages, promotions] = await Promise.all([
-        this.db
-          .select()
-          .from(schema.pricing)
-          .where(eq(schema.pricing.isActive, 1)),
-        this.db
-          .select()
-          .from(schema.timetable)
-          .where(eq(schema.timetable.isActive, 1)),
-        this.db
-          .select()
-          .from(schema.ptPackages)
-          .where(eq(schema.ptPackages.isActive, 1)),
-        this.db
-          .select()
-          .from(schema.promotions)
-          .where(eq(schema.promotions.isActive, 1)),
-      ]);
+  //     const [pricing, timetable, ptPackages, promotions] = await Promise.all([
+  //       this.db
+  //         .select()
+  //         .from(schema.pricing)
+  //         .where(eq(schema.pricing.isActive, 1))
+  //         .limit(15),
+  //       this.db
+  //         .select()
+  //         .from(schema.timetable)
+  //         .where(eq(schema.timetable.isActive, 1))
+  //         .limit(15),
+  //       this.db
+  //         .select()
+  //         .from(schema.ptPackages)
+  //         .where(eq(schema.ptPackages.isActive, 1))
+  //         .limit(15),
+  //       this.db
+  //         .select()
+  //         .from(schema.promotions)
+  //         .where(eq(schema.promotions.isActive, 1))
+  //         .limit(15),
+  //     ]);
 
-      this.pricingCache = pricing;
-      this.timetableCache = timetable;
-      this.ptPackagesCache = ptPackages;
-      this.promotionsCache = promotions.filter(
-        (p) => new Date(p.validUntil) > new Date(),
-      );
+  //     this.pricingCache = pricing;
+  //     this.timetableCache = timetable;
+  //     this.ptPackagesCache = ptPackages;
+  //     this.promotionsCache = promotions.filter(
+  //       (p) => new Date(p.validUntil) > new Date(),
+  //     );
 
-      this.lastCacheUpdate = now;
-      this.logger.log('Content cache refreshed successfully');
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`Failed to refresh cache: ${errorMessage}`);
-      throw new Error('Failed to refresh content cache');
-    }
-  }
+  //     this.lastCacheUpdate = now;
+  //     this.logger.log('Content cache refreshed successfully');
+  //   } catch (error) {
+  //     const errorMessage =
+  //       error instanceof Error ? error.message : 'Unknown error';
+  //     this.logger.error(`Failed to refresh cache: ${errorMessage}`);
+  //     throw new Error('Failed to refresh content cache');
+  //   }
+  // }
 
   async getPricing(): Promise<schema.Pricing[]> {
-    await this.refreshCache();
-    return this.pricingCache;
+    const pricing = await this.db
+      .select()
+      .from(schema.pricing)
+      .where(eq(schema.pricing.isActive, 1))
+      .limit(15);
+    return pricing;
   }
 
   async getTimetable(day?: string): Promise<schema.Timetable[]> {
-    await this.refreshCache();
+    const timetable = await this.db
+      .select()
+      .from(schema.timetable)
+      .where(eq(schema.timetable.isActive, 1))
+      .limit(15);
 
     if (day) {
-      return this.timetableCache.filter(
-        (t) => t.day.toLowerCase() === day.toLowerCase(),
-      );
+      return timetable.filter((t) => t.day.toLowerCase() === day.toLowerCase());
     }
 
-    return this.timetableCache;
+    return timetable;
   }
 
   async getTodaysTimetable(): Promise<schema.Timetable[]> {
@@ -96,19 +106,31 @@ export class ContentService {
   }
 
   async getPtPackages(): Promise<schema.PtPackage[]> {
-    await this.refreshCache();
-    return this.ptPackagesCache;
+    const ptPackages = await this.db
+      .select()
+      .from(schema.ptPackages)
+      .where(eq(schema.ptPackages.isActive, 1))
+      .limit(15);
+    return ptPackages;
   }
 
   async getPromotions(): Promise<schema.Promotion[]> {
-    await this.refreshCache();
-    return this.promotionsCache;
+    const promotions = await this.db
+      .select()
+      .from(schema.promotions)
+      .where(eq(schema.promotions.isActive, 1))
+      .limit(15);
+    return promotions;
   }
 
   async getActivePromotions(): Promise<schema.Promotion[]> {
-    await this.refreshCache();
+    const activePromotions = await this.db
+      .select()
+      .from(schema.promotions)
+      .where(eq(schema.promotions.isActive, 1))
+      .limit(15);
     const now = new Date();
-    return this.promotionsCache.filter((p) => new Date(p.validUntil) > now);
+    return activePromotions.filter((p) => new Date(p.validUntil) > now);
   }
 
   // Format methods for Telegram display

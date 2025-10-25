@@ -14,6 +14,10 @@ dotenv.config();
       token: process.env.TELEGRAM_BOT_TOKEN ?? '',
       launchOptions: {
         dropPendingUpdates: true,
+        webhook: {
+          domain: process.env.TELEGRAM_WEBHOOK_DOMAIN ?? '',
+          hookPath: '/telegram',
+        },
       },
     }),
     ContentModule,
