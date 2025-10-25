@@ -32,8 +32,6 @@ export class TelegramUpdate {
 
   @Start()
   async startCommand(@Ctx() ctx: Context) {
-    this.logger.log(`📨 Received /start command from user ${ctx.from?.id}`);
-
     const keyboard = Markup.inlineKeyboard([
       [Markup.button.callback('💰 Membership Pricing', 'pricing')],
       [Markup.button.callback('📅 Class Timetable', 'timetable')],
@@ -42,17 +40,10 @@ export class TelegramUpdate {
       [Markup.button.callback('📞 Contact Us', 'contact')],
     ]);
 
-    try {
-      await ctx.reply(welcomeMessage, {
-        parse_mode: 'Markdown',
-        ...keyboard,
-      });
-      this.logger.log(
-        `✅ Successfully sent welcome message to user ${ctx.from?.id}`,
-      );
-    } catch (error) {
-      this.logger.error(`❌ Failed to send welcome message: ${error}`);
-    }
+    await ctx.reply(welcomeMessage, {
+      parse_mode: 'Markdown',
+      ...keyboard,
+    });
   }
 
   @Help()
