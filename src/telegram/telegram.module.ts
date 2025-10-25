@@ -8,17 +8,23 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 @Module({
   imports: [
     TelegrafModule.forRoot({
       token: process.env.TELEGRAM_BOT_TOKEN ?? '',
-      launchOptions: {
-        dropPendingUpdates: true,
-        webhook: {
-          domain: process.env.TELEGRAM_WEBHOOK_DOMAIN ?? '',
-          hookPath: '/telegram',
-        },
-      },
+      launchOptions: isProduction
+        ? {
+            dropPendingUpdates: true,
+            webhook: {
+              domain: process.env.TELEGRAM_WEBHOOK_DOMAIN ?? '',
+              hookPath: '/telegram',
+            },
+          }
+        : {
+            dropPendingUpdates: true,
+          },
     }),
     ContentModule,
     InquiryModule,
