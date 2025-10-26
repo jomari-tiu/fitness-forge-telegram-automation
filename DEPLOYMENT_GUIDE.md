@@ -45,6 +45,7 @@ This is a complete Telegram inquiry automation system for Forge Fitness gym. The
    ```bash
    DATABASE_URL=postgresql://neondb_owner:npg_cbSYx6q3Mtwk@ep-holy-fire-a44g93lx-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
    TELEGRAM_BOT_TOKEN=YOUR_BOT_TOKEN_HERE
+   TELEGRAM_WEBHOOK_DOMAIN=https://fitness-forge-telegram-automation.onrender.com
    SMTP_HOST=smtp.gmail.com
    SMTP_PORT=587
    SMTP_USER=jomaritiu16@gmail.com

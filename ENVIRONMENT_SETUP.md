@@ -10,6 +10,7 @@ DATABASE_URL=postgresql://neondb_owner:npg_cbSYx6q3Mtwk@ep-holy-fire-a44g93lx-po
 
 # Telegram Bot Configuration
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+TELEGRAM_WEBHOOK_DOMAIN=https://fitness-forge-telegram-automation.onrender.com
 
 # Email Configuration (Gmail SMTP)
 SMTP_HOST=smtp.gmail.com
@@ -37,6 +38,7 @@ When deploying to Render.com, set these environment variables in the Render dash
 
 - `DATABASE_URL`: Your Neon PostgreSQL connection string
 - `TELEGRAM_BOT_TOKEN`: Your Telegram bot token from @BotFather
+- `TELEGRAM_WEBHOOK_DOMAIN`: https://fitness-forge-telegram-automation.onrender.com
 - `SMTP_HOST`: smtp.gmail.com
 - `SMTP_PORT`: 587
 - `SMTP_USER`: jomaritiu16@gmail.com
