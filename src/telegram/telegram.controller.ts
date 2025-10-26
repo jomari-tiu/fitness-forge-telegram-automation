@@ -5,15 +5,15 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
-  Inject,
 } from '@nestjs/common';
+import { InjectBot } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 
 @Controller('telegram')
 export class TelegramController {
   private readonly logger = new Logger(TelegramController.name);
 
-  constructor(@Inject('TELEGRAF_BOT') private readonly bot: Telegraf) {}
+  constructor(@InjectBot() private readonly bot: Telegraf) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)
