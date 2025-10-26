@@ -13,20 +13,24 @@ const webhookDomain = process.env.TELEGRAM_WEBHOOK_DOMAIN;
 
 @Module({
   imports: [
-    TelegrafModule.forRoot({
-      token: process.env.TELEGRAM_BOT_TOKEN ?? '',
-      launchOptions:
-        isProduction && webhookDomain
-          ? {
-              dropPendingUpdates: true,
-              webhook: {
-                domain: webhookDomain,
-                hookPath: '/telegram',
+    TelegrafModule.forRootAsync({
+      useFactory: () => ({
+        token: process.env.TELEGRAM_BOT_TOKEN ?? '',
+        launchOptions:
+          isProduction && webhookDomain
+            ? {
+                dropPendingUpdates: true,
+                webhook: {
+                  domain: webhookDomain,
+                  hookPath: '/telegram',
+                  secretToken:
+                    process.env.TELEGRAM_BOT_TOKEN?.split(':')[1] || 'secret',
+                },
+              }
+            : {
+                dropPendingUpdates: true,
               },
-            }
-          : {
-              dropPendingUpdates: true,
-            },
+      }),
     }),
     ContentModule,
     InquiryModule,
