@@ -9,9 +9,16 @@ export class WebhookSetupService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
-    // Only set webhook in production
-    if (this.configService.get('NODE_ENV') === 'production') {
-      await this.setupWebhook();
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
+    const useWebhook = this.configService.get('USE_WEBHOOK') === 'true';
+
+    if (isProduction) {
+      if (useWebhook) {
+        await this.setupWebhook();
+      } else {
+        // Clear webhook to enable polling
+        await this.clearWebhook();
+      }
     }
   }
 
@@ -49,6 +56,38 @@ export class WebhookSetupService implements OnModuleInit {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`❌ Webhook setup error: ${errorMessage}`);
+    }
+  }
+
+  private async clearWebhook() {
+    try {
+      const botToken = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
+
+      if (!botToken) {
+        this.logger.warn('Missing TELEGRAM_BOT_TOKEN');
+        return;
+      }
+
+      const telegramApiUrl = `https://api.telegram.org/bot${botToken}/deleteWebhook`;
+
+      this.logger.log('🧹 Clearing webhook to enable polling...');
+
+      const response = await axios.post(telegramApiUrl, {
+        drop_pending_updates: true,
+      });
+
+      const data = response.data as { ok: boolean; description?: string };
+      if (data.ok) {
+        this.logger.log(
+          '✅ Webhook cleared successfully - polling can now start',
+        );
+      } else {
+        this.logger.error(`❌ Failed to clear webhook: ${data.description}`);
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`❌ Webhook clear error: ${errorMessage}`);
     }
   }
 }
