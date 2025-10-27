@@ -15,13 +15,32 @@ dotenv.config();
   imports: [
     ConfigModule,
     TelegrafModule.forRootAsync({
-      useFactory: () => ({
-        token: process.env.TELEGRAM_BOT_TOKEN ?? '',
-        launchOptions: {
-          dropPendingUpdates: true,
-          // Disable automatic webhook - handle it manually
-        },
-      }),
+      useFactory: () => {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const useWebhook = process.env.USE_WEBHOOK === 'true';
+
+        if (isProduction && useWebhook) {
+          // Use webhook in production (if explicitly enabled)
+          return {
+            token: process.env.TELEGRAM_BOT_TOKEN ?? '',
+            launchOptions: {
+              dropPendingUpdates: true,
+            },
+          };
+        } else {
+          // Use polling (better for free tier)
+          return {
+            token: process.env.TELEGRAM_BOT_TOKEN ?? '',
+            launchOptions: {
+              dropPendingUpdates: true,
+              polling: {
+                timeout: 30,
+                limit: 100,
+              },
+            },
+          };
+        }
+      },
     }),
     ContentModule,
     InquiryModule,
