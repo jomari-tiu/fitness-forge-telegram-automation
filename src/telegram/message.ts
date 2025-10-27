@@ -1,3 +1,5 @@
+import { CreateInquiryDto } from 'src/schemas/inquiry.schema';
+
 export const welcomeMessage = `
 🏋️ *Welcome to Forge Fitness!*
 
@@ -39,3 +41,30 @@ export const helpfulMessage = `
         
         You can also use the menu below or ask me specific questions about our gym services!
               `;
+
+export const submissionFailedMessage = `
+              ❌ *Submission Failed*
+              
+              Sorry, there was an error submitting your request. Please try again or contact us directly:
+              
+              📧 jomaritiu16@gmail.com
+              🌐 https://forge-fitness-phi.vercel.app/
+              
+              We apologize for the inconvenience!
+                    `;
+
+export const submissionSuccessMessage = (inquiry: CreateInquiryDto) => {
+  return `
+              ✅ *Submission Success*
+              
+              Thank you for your request! We've received your information:
+              
+              📧 Email: ${inquiry.email}
+              📞 Phone: ${inquiry.phone}
+              🎯 Interest: ${inquiry.preferredClass}
+
+              Our team will contact you within 24 hours. We're excited to help you on your fitness journey!
+
+              *In the meantime, feel free to explore more about our services:*
+            `;
+};

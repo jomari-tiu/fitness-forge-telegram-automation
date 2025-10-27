@@ -128,7 +128,7 @@ export class DeliveryService {
         this.staffChannelId,
         message,
         {
-          parse_mode: 'Markdown',
+          parse_mode: 'HTML',
         },
       );
 
@@ -192,21 +192,36 @@ export class DeliveryService {
   }
 
   private generateStaffTelegramMessage(inquiry: CreateInquiryDto): string {
+    // Escape HTML special characters for Telegram HTML parse mode
+    const escapeName = this.escapeHtml(inquiry.fullName);
+    const escapePhone = this.escapeHtml(inquiry.phone);
+    const escapeEmail = this.escapeHtml(inquiry.email);
+    const escapeClass = this.escapeHtml(inquiry.preferredClass);
+    const escapeDate = this.escapeHtml(new Date().toLocaleString());
+
     return `
-🏋️ *New Gym Inquiry - Forge Fitness*
+🏋️ <b>New Gym Inquiry - Forge Fitness</b>
 
-👤 *Name:* ${inquiry.fullName}
-📞 *Phone:* ${inquiry.phone}
-📧 *Email:* ${inquiry.email}
-🎯 *Interested in:* ${inquiry.preferredClass}
+👤 <b>Name:</b> ${escapeName}
+📞 <b>Phone:</b> ${escapePhone}
+📧 <b>Email:</b> ${escapeEmail}
+🎯 <b>Interested in:</b> ${escapeClass}
 
-⏰ *Received:* ${new Date().toLocaleString()}
+⏰ <b>Received:</b> ${escapeDate}
 
-💡 *Action Required:* Please follow up with this potential member within 24 hours for best results!
+💡 <b>Action Required:</b> Please follow up with this potential member within 24 hours for best results!
 
 ---
-_Automated notification from Forge Fitness Bot_
+<i>Automated notification from Forge Fitness Bot</i>
     `.trim();
+  }
+
+  private escapeHtml(text: string): string {
+    // Escape HTML special characters for Telegram HTML parse mode
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   // Test email configuration

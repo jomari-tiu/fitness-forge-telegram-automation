@@ -6,7 +6,13 @@ import { InquiryService } from '../inquiry/inquiry.service';
 import { RetryService } from '../retry/retry.service';
 import { createInquirySchema } from '../schemas/inquiry.schema';
 import { Logger } from '@nestjs/common';
-import { helpfulMessage, helpMessage, welcomeMessage } from './message';
+import {
+  helpfulMessage,
+  helpMessage,
+  submissionFailedMessage,
+  submissionSuccessMessage,
+  welcomeMessage,
+} from './message';
 
 interface SessionData {
   awaitingInquiry?: boolean;
@@ -432,19 +438,7 @@ Great! I'll collect some information so our team can contact you.
       // Process immediate deliveries
       await this.retryService.processImmediateDelivery(inquiry.id);
 
-      const successMessage = `
-✅ *Callback Request Submitted!*
-
-Thank you, ${validatedData.fullName}! We've received your information:
-
-📧 Email: ${validatedData.email}
-📞 Phone: ${validatedData.phone}
-🎯 Interest: ${validatedData.preferredClass}
-
-Our team will contact you within 24 hours. We're excited to help you on your fitness journey!
-
-*In the meantime, feel free to explore more about our services:*
-      `;
+      const successMessage = submissionSuccessMessage(validatedData);
 
       const keyboard = Markup.inlineKeyboard([
         [Markup.button.callback('💰 View Pricing', 'pricing')],
@@ -460,20 +454,7 @@ Our team will contact you within 24 hours. We're excited to help you on your fit
       this.logger.error(
         `Error submitting inquiry: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
-
-      await ctx.reply(
-        `
-❌ *Submission Failed*
-
-Sorry, there was an error submitting your request. Please try again or contact us directly:
-
-📧 jomaritiu16@gmail.com
-🌐 https://forge-fitness-phi.vercel.app/
-
-We apologize for the inconvenience!
-      `,
-        { parse_mode: 'Markdown' },
-      );
+      await ctx.reply(submissionFailedMessage, { parse_mode: 'Markdown' });
     }
   }
 
