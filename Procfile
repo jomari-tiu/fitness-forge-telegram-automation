@@ -1,1 +1,1 @@
-web: node --max-old-space-size=460 dist/main.js
+web: node --max-old-space-size=400 dist/main.js
